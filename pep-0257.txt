@@ -1,0 +1,343 @@
+PEP-JP: 257
+
+
+オリジナルのヘッダ
+==================
+
+PEP: 257
+Title: Docstring Conventions
+Version: $Revision: 1.1.1.1 $
+Last-Modified: $Date: 2003/03/19 01:15:10 $
+Author: David Goodger <goodger@users.sourceforge.net>,
+        Guido van Rossum <guido@python.org>
+Discussions-To: doc-sig@python.org
+Status: Active
+Type: Informational
+Content-Type: text/x-rst
+Created: 29-May-2001
+Post-History: 13-Jun-2001
+
+
+概要
+====
+
+この PEP ドキュメントでは，様々な Python ドキュメンテーション文字列
+(docstring) について，その意味と取り決めを記述します．
+
+
+PEP の位置付け
+==============
+
+この PEP の目的は，docstring (ドキュメンテーション文字列，以降
+docstring) の高レベル構造: どんな情報を含めるべきか，そしてどのように 
+(docstring のマークアップ文法に抵触せずに) docstring を書くべきか，
+を標準化することです． この PEP で記述されているのは取り決めであり，
+規則や文法ではありません．
+
+    "万人のための取り決めは，管理のしやすさ (maintainability)，明瞭さ
+    (clarity)，一貫性 (consistency) の全てを提供します．そしてよい
+    プログラム作法の基礎にもなります．
+    この取り決めは意思に反してまで従うように強要するものではありません．
+    つまり，心にささやくおばけ (Python) に過ぎないのです！"
+
+    -- Tim Peters on comp.lang.python, 2001-06-16
+
+ここで示されている取り決めに違反しても，最悪でも多少ひどい見かけ
+になる程度でしょう．しかし，(Docutils_ docstring 処理システム 
+[1]_ [2]_ のような) ソフトウェアはこの取り決めを前提とする
+ので，取り決めに従った方が最良の結果となるはずです．
+
+
+仕様
+====
+
+docstring とは何か?
+--------------------
+
+docstring とは，モジュール，関数，クラス，メソッドといった
+オブジェクトを定義する部分の最初の行にある文字列リテラルです．
+このような docstring は，そのオブジェクトの特殊属性 ``__doc__'' 
+になります．
+
+全てのモジュールは普通 docstring を持たねばならず，モジュールが公開
+している全ての関数やクラスもまた，docstring を持っていなければ
+なりません．(``__init__'' コンストラクタを含む) 公開メソッドも
+docstring を持たなければなりません．パッケージの場合，パッケージ
+ディレクトリの ``__init__.py'' ファイルの docstring でドキュメントを
+記述することもあります．
+
+Python コード中のその他の場所にある文字列リテラルもドキュメンテーション
+として振舞うことができます．Python バイトコードコンパイラはこのリテラル
+を認識しないので，実行時オブジェクトの属性としてはアクセスすることが
+できません (すなわち，``__doc__'' には代入されません)．しかし，2 種類の
+特殊な docstring はソフトウェアツールによって展開することができます:
+
+1. モジュール，クラス， __init__ メソッドにおける単純な代入文の直後に
+   現れる文字列リテラルは "属性 docstring  (attribute docstrings)" 
+   と呼ばれます．
+
+2. 他の docstring の直後に現れる文字列リテラルは 
+   "追加情報 docstring  (additional docstrings)" と呼ばれます．
+
+属性および追加情報 docstring の詳細については，PEP 258 
+"Docutils Design Specification" [2]_ を参照してください．
+
+XXX Mention docstrings of 2.2 properties.
+
+一貫性のために， docstring を囲う引用符には，常に 
+``"""三連二重引用符"""`` を用いてください． docstring 中に
+バックスラッシュを使う場合には， ``r"""生文字列の三連二重引用符"""`` 
+を使ってください．Unicode  docstring には，
+``u"""Unicode 三連二重引用符"""`` を使ってください．
+
+ docstring には二つの形式があります: 一行形式と複数行形式です．
+
+
+一行形式 docstring 
+------------------
+
+一行形式は非常に明確な目的の下に用いられます．
+一行形式は本当に 1 行に収まらなければなりません．例えば::
+
+    def kos_root():
+        """Return the pathname of the KOS root directory."""
+        global _kos_root
+        if _kos_root: return _kos_root
+        ...
+
+注意:
+
+- 文字列が 1 行内に収まっていても，三連二重引用符を使います．これにより，
+  後で docstring を展開しやすくなります．
+
+- 閉じ側の引用符は開き側の引用符と同じ行になければなりません．そうする
+  ことで，一行形式を見やすくなります．
+
+-  docstring の前にも後ろにも空行を入れてはなりません．
+
+- この docstring はピリオドで終わる文です．この文字列では，関数や
+  メソッドの ("あれを行う", "それを返す" といった) 命令としての効果
+  を既定し，詳細記述は行いません; "... であるパス名を返す" のようには
+  書かないでください．
+
+- 一行形式の docstring は関数やメソッドの引数を繰り返し記述するような
+  "用法注意 (signature)" を含めてはいけません (この情報は Python の
+  内省機能で取得できます)．
+
+  以下のような書き方をしないでください．::
+
+      def function(a, b):
+          """function(a, b) -> list"""
+
+  このような docstring の書き方が適切なのは，(組み込み関数のような) 
+  内省機能の働かない C 関数だけです．とはいえ，*戻り値* の特性に
+  ついては内省機能で判定することができないので記述するべきです．
+  この場合には，望ましい docstring の形式は以下のようになります::
+
+      def function(a, b):
+          """Do X and return a list."""
+
+  (もちろん，"Do X" はもっと意味のある記述に置き換えてくださいね！)
+
+
+複数行形式の docstring 
+----------------------
+
+複数行の docstring の構成では，一行 docstring と同じ概要を記述した
+一行と，続く空行，そしてその後により詳細な記述を続けます．概要の行は
+自動インデクス生成ツールで利用されることがあります; 従って，この概要は
+1 行内に収まり，以降の docstring と空白行で分割されている必要があります．
+この概要行は最初の行の引用符と同じ行にあっても，その次の行にあっても
+かまいません． docstring 全体はクオートのある最初の行か，その次の行
+と同じレベルにインデントします (以下を参照してください)
+
+クラスについて記述している (一行形式と複数行形式の) docstring は全て，
+前と後ろに空白行を挿入してください．一般的に言って，クラスの各々の
+メソッドは互いに空白行 1 行で分割されていますが，クラスの docstring
+は最初のメソッドから空白行 1 行離して書かれている必要があります;
+対称性を持たせるために，クラスのヘッダ部分と docstring の間にも
+空白行を 1 行入れてください．関数やメソッドについて記述している
+docstring に対しては，通常こうした要求はありません．例外は関数や
+メソッドの本体が幾つかのセクションからなっていて，空白行で区切られて
+いる場合です -- この場合，docstring も一つのセクションとして
+扱い，その前に空白行を一行付けてください．
+
+スクリプト (スタンドアロンのプログラム) の docstring は "使用法"
+メッセージとして使うことができ，スクリプトが間違った引数や引数
+なしで起動された場合 (あるいは "ヘルプ" を表す "-h" オプションで
+起動された場合) に出力されます．この docstring はスクリプトの機能
+やコマンドライン書法，環境変数，そしてファイルについて記述しなければ
+なりません．使用法メッセージは (数画面分いっぱいにわたるぐらい) 
+かなり詳細なものとすべきで，初めてスクリプトを使用するユーザが
+正しくコマンドを利用できると同時に，熟練したユーザが全てのオプション
+と引数を完全に素早く参照できるくらいでなければなりません．
+
+モジュールの docstring は通常，モジュールが提供するクラス，例外，
+関数 (そしてその他のオブジェクト) について列挙し，それぞれに
+1 行の概要を与えます．(これらの概要は普通，オブジェクトの概要
+docstring よりも少ない情報を与えます．) パッケージの docstring
+(すなわち package の ``__init__.py'' モジュールの docstring)
+もまた，package が提供するモジュールやサブパッケージを列挙しなければ
+なりません．
+
+関数やメソッドの docstring では，その動作について概説し，引数や
+戻り値，副作用，発行される例外，関数やメソッドを呼び出せる状況への
+制限を (それぞれ存在する場合) 記述します．オプションの引数も示す
+べきです．キーワード引数がインタフェースの一部となっているかどうかも
+記述しなければなりません．
+
+クラスの docstring では，その動作について概説し，公開するメソッドや
+インスタンス変数について列挙します．クラスがサブクラス化を想定して
+いる場合，またサブクラスのための追加インタフェースを持っている場合，
+そのインタフェースは (docstring 内で) 別に列挙しなければなりません．
+クラスのコンストラクタは ``__init__'' メソッドで記述し，
+個々のメソッドについてはそれぞれの docstring で記述すべきです．
+
+あるクラスが別のクラスをサブクラス化しており，その動作のほとんどが
+上位クラスから継承したものである場合，サブクラスの docstring では
+そのことについて触れ，差分について概説しなければなりません．
+あるサブクラスのメソッドが上位クラスのメソッドを置き換えており，
+上位クラスメソッドを呼ばない場合の記述には，動詞 "上書き (override)" 
+を使い，サブクラスのメソッドで (サブクラス独自の動作に加えて) 上位
+クラスのメソッドを呼び出している場合には，動詞 "拡張 (extend)" を
+使ってください．
+
+
+関数やメソッドの引数を一行内に大文字で記述する Emacs 様式は 
+*使わないでください．* Python は大小文字の区別を行うため，大文字で
+記述した引数の名前をキーワード引数として扱ってしまう可能性がある
+ので，docstring では正しい引数名を記述しなければなりません．
+最良の方法は個々の引数を別々の行に列挙することです．例えば::
+
+    def complex(real=0.0, imag=0.0):
+        """Form a complex number.
+
+        Keyword arguments:
+        real -- the real part (default 0.0)
+        imag -- the imaginary part (default 0.0)
+
+        """
+        if imag == 0.0 and real == 0.0: return complex_zero
+        ...
+
+The BDFL [3]_ では，複数行の docstring における最終段落と，docstring
+を閉じる引用符との間に空行を 1 行挿入し，最後は閉じ引用符だけの
+行にするよう推奨しています．こうすることで，Emacs の ``fill-paragraph''
+コマンドを使うことができます．
+
+
+docstring のインデントをどうするか
+----------------------------------
+
+docstring 処理ツールは，docstring の先頭行以降の全ての空行でない
+行の中で最小のインデント量に等しいだけのインデント空白を，docstring
+の 2 行目以降から剥ぎ取ります．docstring の最初の行におけるインデント
+dostring 最初の行にある (すなわち最初の改行までの) 何らかのインデント
+には意味がなく，取り去られます．docstring 内の以降の行における相対的な
+インデントは残されます．空白行は docstring の先頭から末尾まで取り
+去られるはずです．
+
+言葉よりもコードの方が明確なので，以下にそのアルゴリズムを実装した
+ものを示します::
+
+    def trim(docstring):
+        if not docstring:
+            return ''
+        # Convert tabs to spaces (following the normal Python rules)
+        # and split into a list of lines:
+        lines = docstring.expandtabs().splitlines()
+        # Determine minimum indentation (first line doesn't count):
+        indent = sys.maxint
+        for line in lines[1:]:
+            stripped = line.lstrip()
+            if stripped:
+                indent = min(indent, len(line) - len(stripped))
+        # Remove indentation (first line is special):
+        trimmed = [lines[0].strip()]
+        if indent < sys.maxint:
+            for line in lines[1:]:
+                trimmed.append(line[indent:].rstrip())
+        # Strip off trailing and leading blank lines:
+        while trimmed and not trimmed[-1]:
+            trimmed.pop()
+        while trimmed and not trimmed[0]:
+            trimmed.pop(0)
+        # Return a single string:
+        return '\n'.join(trimmed)
+
+以下の例の docstring は 2 つの改行文字を含むので，
+結果として 3 行になります．最初と最後の行は空行です::
+
+    def foo():
+        """
+        This is the second line of the docstring.
+        """
+
+実例を挙げると::
+
+    >>> print repr(foo.__doc__)
+    '\n    This is the second line of the docstring.\n    '
+    >>> foo.__doc__.splitlines()
+    ['', '    This is the second line of the docstring.', '    ']
+    >>> trim(foo.__doc__)
+    'This is the second line of the docstring.'
+
+切り詰めを行うと，これらの docstring は同じになります::
+
+    def foo():
+        """A multi-line
+        docstring.
+        """
+
+    def bar():
+        """
+        A multi-line
+        docstring.
+        """
+
+
+参考文献および補足
+==================
+
+.. [1] PEP 256, Docstring Processing System Framework, Goodger
+   (http://www.python.org/peps/pep-0256.html)
+
+.. [2] PEP 258, Docutils Design Specification, Goodger
+   (http://www.python.org/peps/pep-0258.html)
+
+.. [3] Guido van Rossum, Python's creator and Benevolent Dictator For
+   Life.
+
+.. _Docutils: http://docutils.sourceforge.net/
+
+.. _Python Style Guide:
+   http://www.python.org/doc/essays/styleguide.html
+
+.. _Doc-SIG: http://www.python.org/sigs/doc-sig/
+
+
+著作権
+======
+
+このドキュメントはパブリックドメインにされています．
+
+
+謝辞
+====
+
+"仕様" の部分のテキストはほとんど Guido van Rossum による
+`Python Style Guide'_ エッセイからそのまま引用したものです．
+
+このドキュメントは Python Doc-SIG_ のアーカイブからいくつかアイデアを
+拝借しています．以前のそして現在の全ての SIG メンバに感謝します．
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   fill-column: 70
+   sentence-end-double-space: t
+   End:
+

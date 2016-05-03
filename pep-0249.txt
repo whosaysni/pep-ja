@@ -101,14 +101,14 @@ PEP-0249: Python データベース API 仕様 v2.0
     ============ ===================================================
 
 
-.. _`Exceptions:`
+.. _Exceptions:
 
 例外
 ------
 
 モジュールは、全てのエラー情報や例外を、以下の例外のサブクラスを介して扱えねばなりません。
 
-.. _`Warning`:
+.. _Warning:
 
 `Warning`
   データの挿入中に欠落が生じた場合など、重要な警告時に発行される例外です。
@@ -117,7 +117,7 @@ PEP-0249: Python データベース API 仕様 v2.0
 __ http://docs.python.jp/2/library/exceptions.html
 __ http://docs.python.jp/2/library/exceptions.html#exceptions.StandardError
 
-.. _`Error`:
+.. _Error:
 
 `Error`
   上記以外の全ての例外に対する基底クラスです。
@@ -125,39 +125,51 @@ __ http://docs.python.jp/2/library/exceptions.html#exceptions.StandardError
   警告はエラーとみなさないので、このクラスをベースにしてはなりません。
   Python の StandardError のサブクラスにせねばなりません。
     
-.. _`InterfaceError`:
+.. _InterfaceError:
 
 `InterfaceError`
   データベース自体ではなく、データベースインタフェースに関係するエラーの際に送出する例外です。 Error_ のサブクラスにせねばなりません。
 
-.. _`DatabaseError`:
+.. _DatabaseError:
 
-`DatabaseError`_
+`DatabaseError`
   データベースに関係するエラーの際で送出する例外です。
   Error_ のサブクラスにせねばなりません。
     
-`DataError`_
+.. _DataError:
+
+`DataError`
   ゼロによる除算、数値の定義域超えなど、処理済のデータに問題が生じたことに起因するエラーの際に送出する例外です。
   DatabaseError_ のサブクラスにせねばなりません。
     
-`OperationalError`_
+.. _OperationalError:
+
+`OperationalError`
   データベースの操作に関連したエラーで、プログラマがコントロールしきれない状況に対して送出される例外です。
   例えば、予期しない接続遮断の発生、データソース名が見つからなかった、トランザクションが処理できなかった、処理中に発生したメモリアロケーションエラーなどです。
   DatabaseError_ のサブクラスにせねばなりません。
-    
-`IntegrityError`_
+
+.. _IntegrityError:
+
+`IntegrityError`
   外部キーチェックの失敗のような、データベースの完全性が影響する場合に送出するエラーです。
   DatabaseError_ のサブクラスにせねばなりません。
     
-`InternalError`_
+.. _InternalError:
+
+`InternalError`
   カーソルが有効でなくなっている、トランザクションの同期がとれない、といった、データベースが内部エラーを起こした場合に送出する例外です。
   DatabaseError_ のサブクラスにせねばなりません。
     
-`ProgrammingError`_
+.. _ProgrammingError:
+
+`ProgrammingError`
   テーブルが見つからない、テーブルがすでに存在する、SQL 文の構文エラー、引数の数が間違って指定されているといった、SQL 文のエラーに対して送出する例外です。 
   DatabaseError_ のサブクラスにせねばなりません。
     
-`NotSupportedError`_
+.. _NotSupportedError:
+
+`NotSupportedError`
   トランザクションをサポートしないか無効になっている接続に対して `.rollback()`_ を要求したときのように、データベースがサポートしていないメソッドやデータベース API を使った時に送出する例外です。
   DatabaseError_ のサブクラスにせねばなりません。
     
@@ -182,37 +194,44 @@ __ http://docs.python.jp/2/library/exceptions.html#exceptions.StandardError
 .. _Connection Object:
 
 コネクションオブジェクト
-==================
+==========================
 
 コネクションオブジェクトは以下のメソッドに応答しなければなりません。
 
 .. _`Connection methods`:
 
 コネクションオブジェクトのメソッド
----------------------------
+------------------------------------
 
 .. _Connection.close:
 
-`.close()`_
+`.close()`
     (`__del__` を呼び出したときと違って) 接続を即座に切断します。
     その後、接続は使用できなくなります。
-     切断された接続に対して何らかの操作を試みると、 `Error` (またはそのサブクラスの) 例外を送出します。
+    切断された接続に対して何らかの操作を試みると、 `Error` (またはそのサブクラスの) 例外を送出します。
     この接続を利用しようとする全てのカーソルに対しても同様です。
     前もって更新の commit を行わずに接続の切断をすると、暗黙的にロールバックを実行します。
 
 .. _Connection.commit:
+.. _`.commit()`:
         
-`.commit()`_      
+`.commit()`
     処理中のトランザクションをデータベースに commit します。
     データベースが自動コミット (auto-commit) 機能をサポートしている場合、自動 commit 機能は初期状態で必ずオフになっています。
     自動コミットをオンに戻すインタフェースメソッドが提供されている場合もあります。
     トランザクションをサポートしないデータベースモジュールでは、このメソッドを何もしない (void functionality) メソッドとして実装すべきです。
         
+.. _Connection.rollback:
+.. _`.rollback()`:
+
 `.rollback()`
     全てのデータベースがトランザクションをサポートしているわけではないので、このメソッドはオプションです。 [3]_
         
     データベースがトランザクション機能を提供している場合、このメソッドは、処理中のトランザクションすべてについて、トランザクション開始時の状態にデータベースをロールバック (roll back) させます。
     前もって更新の commit を行わずに接続の切断をすると、暗黙的にロールバックを実行します。
+
+.. _Connection.cursor:
+.. _`.cursor()`:
 
 `.cursor()`
     現在の接続を使って、新たなカーソルオブジェクトを返します。
@@ -238,15 +257,22 @@ __ http://docs.python.jp/2/library/exceptions.html#exceptions.StandardError
 カーソルの属性
 ----------------
 
+.. _Cursor.description:
+.. _`.description`:
+.. _`type_code`:
+
 `.description`
     読み出し専用の属性で、配列です。配列の各要素は 7 要素の配列です。
     各要素の配列には、クエリ結果の個々のカラム情報に関する記述: `(name, type_code, display_size, internal_size, precision, scale, null_ok)` が入っています。
-    先頭の二つの要素 (name と type_code) は必須の要素です。
+    先頭の二つの要素 (``name`` と ``type_code``) は必須の要素です。
     その他はオプションで、有意な値を提供できない場合には `None` に設定せねばなりません。
 
     応答行を返さない操作や、カーソルに `executeXXX()` メソッドを介した操作を行っていない場合には、この属性は `None` になります。
     
     `type_code` は、下節で定義されている型オブジェクト (Type Object) との比較で解釈できます。
+
+.. _Cursor.rowcount:
+.. _`.rowcount`:
     
 `.rowcount`
     読み出し専用の属性で、最後に実行した `executeXXX()` によって (`'select'` のような DQL 文で) 生成された行や、 (`'update'` や `'insert'` のような DML 文が) 影響を及ぼした行数を示します。
@@ -254,7 +280,11 @@ __ http://docs.python.jp/2/library/exceptions.html#exceptions.StandardError
     現在のカーソルがまだ `executeXXX()` を実行していない場合や、データベースインタフェースから最後に行った操作の結果行数を決定できない場合には、この属性は -1 となります。 [7]_
 
     Note: 将来のバージョンの DB API 使用では、後者のケースについては -1 でなく None を返すように再定義するかもしれません。
-    
+
+.. _Cursor.callproc:
+.. _`.callproc`:
+.. _`.callproc()`:
+
 `.callproc(procname [,parameters])`
     (全てのデータベースがストアドプロシジャ (stored procedure) をサポートしているわけではないので、このメソッドはオプションです。 [3]_)
     
@@ -263,11 +293,19 @@ __ http://docs.python.jp/2/library/exceptions.html#exceptions.StandardError
     呼び出し結果は、 `parameters` に指定した配列のコピーを、ストアドプロシジャによって変更したものです。
     このコピーでは、入力専用のパラメタはそのまま残され、出力および入出力用のパラメタが必要に応じて新たな値で置き換わっています。
     
-    プロシジャは出力として処理結果を出すことがあります。この場合、処理結果は標準的な ``fetchXXX()` メソッドを介して取得できねばなりません。
-    
+    プロシジャは出力として処理結果を出すことがあります。この場合、処理結果は標準的な `.fetch*()`_ メソッドを介して取得できねばなりません。
+
+
+.. _Cursor.close:
+
 `.close()`
     (`__del__` を呼び出したときと違って) カーソルを即座に閉じます。その後、当該カーソルは利用できなくなります。
     閉じたカーソルに対してどのような操作を行っても、Error (またはそのサブクラスの) 例外を送出します。
+
+
+.. _Cursor.execute:
+.. _`execute*()`:
+.. _`.execute()`:
     
 `.execute(operation [,parameters])`  
     データベース操作 (クエリやコマンド) を準備して実行します。
@@ -286,6 +324,10 @@ __ http://docs.python.jp/2/library/exceptions.html#exceptions.StandardError
     
     戻り値の指定はありません。
     
+.. _Cursor.executemany:
+.. _`.executemany()`:
+.. _`executemany()`:
+
 `.executemany(operation, seq_of_parameters)`
   
     データベース操作 (クエリまたはコマンド) を準備し、
@@ -300,11 +342,18 @@ __ http://docs.python.jp/2/library/exceptions.html#exceptions.StandardError
     
     戻り値の指定はありません。
     
+.. _`.fetch*()`:
+.. _Cursor.fetchone:
+.. _`.fetchone()`:
+
 `.fetchone()`
     クエリ結果セットの次の行を取得し、配列を返します。
     次のデータがなかった場合には None を返します。 [6]_
     
     直前に呼び出した `executeXXX()` が何も結果を生成しなかった場合や、まだ何も実行していないのにこのメソッドを呼んだ場合には、 Error (またはそのサブクラスの) 例外を送出します。
+
+.. _Cursor.fetchmany:
+.. _`fetchmany()`:
 
 `fetchmany([size=cursor.arraysize])`
     クエリ結果の次の一連の行集合を取得し、各行のデータ配列からなる配列を (タプルのリストなどで) 返します。取得できるデータがないときには空の配列を返します。
@@ -320,12 +369,19 @@ __ http://docs.python.jp/2/library/exceptions.html#exceptions.StandardError
     最適なパフォーマンスを実現するには、通常は arraysize 属性を使うのがベストです。
     size パラメタを指定する場合は、 `fetchmany()` の呼び出しごとに同じ size を使うのがベストです。
     
-``.fetchall()``
+.. _Cursor.fetchall:
+.. _`.fetchall()`:
+
+`.fetchall()`
     全ての (カーソルに残っている) クエリ結果行を取得し、配列の配列 (タプルからなるリスト) を返します。
     カーソルの arraysize 属性は、この操作のパフォーマンスに影響を及ぼすので注意してください。
     
     直前に呼び出した `executeXXX()` が何も結果セットを生成しなかった場合や、まだ何も呼び出しを行っていない場合には、 Error (またはそのサブクラスの) 例外を送出します。
-        
+
+.. _Cursor.nextset:
+.. _`.nextset()`:
+.. _`nextset()`:
+
 `.nextset()`
     (全てのデータベースが結果セットの多重化をサポートしているわけではないので、このメソッドはオプションです。 [3]_)
     
@@ -333,201 +389,191 @@ __ http://docs.python.jp/2/library/exceptions.html#exceptions.StandardError
     その際現在の結果セット上の残りのデータは無視されます。
     
     次の結果セットがない場合、このメソッドは None を返します。
-    そうでない場合には真値を返し、以降の `fetch`_ メソッドは次の結果セットから行データを返すことになります。
+    そうでない場合には真値を返し、以降の `.fetch*()`_ メソッドは次の結果セットから行データを返すことになります。
     
     直前に呼び出した `executeXXX()` が何も結果セットを生成しなかったり、まだ何も呼び出しを行っていない場合には、 Error (またはそのサブクラスの) 例外を送出します。
+
+.. _Cursor.arraysize:
+.. _`.arraysize`:
 
 `.arraysize`
     読み書き可能な属性値で、 `fetchmany()` で一度に取得可能な行数を指定します。デフォルトの値は 1 で、これは一度に一つの行しか取得できないことを意味します。
     
     `fetchmany()` メソッドに関しては、実装上はこの値を参照せねばなりませんが、データベースとは一度に一行づつやりとりをしてもかまいません。
     この値を `executemany()` の実装で使ってもかまいません。
-    
+
+.. _Cursor.setinputsizes:
+.. _`.setinputsizes(sizes)`:
+
 `.setinputsizes(sizes)`  
     `executeXXX()` の呼び出し前に、データベース操作パラメタとして使うメモリ領域を予約するために使われます。
     
-    sizes は配列で指定します -- 各入力パラメタあたり一要素です。
-    各要素は入力パラメタの型に対応する型オブジェクト (Type
-    Object) か、文字列パラメタの場合にはその最大長を指定する整
-    数値です。要素を None にすると、そのカラムに対してはメモリ
-    予約を行いません (これは巨大な入力に対するメモリ予約を避け
-    るのに有効です)。
+    *sizes* は配列で指定します -- 各入力パラメタあたり一要素です。
+    各要素は入力パラメタの型に対応する型オブジェクト (Type Object) か、文字列パラメタの場合にはその最大長を指定する整数値です。
+    要素を ``None`` にすると、そのカラムに対してはメモリ予約を行いません (これは巨大な入力に対するメモリ予約を避けるのに有効です)。
     
-    このメソッドは executeXXX() メソッドを呼び出す前に使います。
+    このメソッドは ``executeXXX()`` メソッドを呼び出す前に使います。
     
-    実装では、このメソッドを何も処理しないようにしてよく、ユー
-    ザはこのメソッドを使わなくてもかまいません。
+    実装では、このメソッドを何も処理しないようにしてよく、ユーザはこのメソッドを使わなくてもかまいません。
     
+.. _Cursor.setoutputsize:
+.. _`.setoutputsize(size[,column])`:
+
 `.setoutputsize(size[,column])`
   
-    巨大なカラムデータ (LONG, BLOB 等) を fetch するためのカラ
-    ムバッファサイズを設定します。カラムは結果行の配列における
-    インデクスで指定します。カラムの指定を省略すると、カーソル
-    中の全ての巨大データカラムに対してデフォルトサイズを設定し
-    ます。
+    巨大なカラムデータ (``LONG``, ``BLOB`` 等) を fetch するためのカラムバッファサイズを設定します。
+    カラムは結果行の配列におけるインデクスで指定します。
+    カラムの指定を省略すると、カーソル中の全ての巨大データカラムに対してデフォルトサイズを設定します。
     
-    このメソッドは executeXXX() メソッドを呼び出す前に使わなけ
-    ればなりません。
+    このメソッドは ``executeXXX()`` メソッドを呼び出す前に使わなければなりません。
     
-    実装では、このメソッドを何も処理しないようにしてよく、ユー
-    ザはこのメソッドを使わなくてもかまいません。
+    実装では、このメソッドを何も処理しないようにしてよく、ユーザはこのメソッドを使わなくてもかまいません。
             
-
+.. _Type Objects:
 .. _Type Objects and Constructors:
 
 型オブジェクト (Type Object) とコンストラクタ
 ===============================================
 
-多くのデータベースでは、入力を特定の書式にして操作の入力パラメタに
-結びつける必要があります。例えば、入力を DATE カラムに振り向ける場
-合、データベースに応じた特定の文字列書式になっていなければなりませ
-ん。"Row ID" カラムや、巨大なバイナリ要素 (blob や RAW カラム) に
-も同様の問題があります。このため、executeXXX() メソッドの引数を一
-定形式化できないという問題を Python 側にもたらします。データベース
-モジュールが Python 文字列オブジェクトを見つけた場合、モジュールは
-この文字列を単なる CHAR カラムに結びつけるべきか、あるいは素の
-BINARY 要素か、DATE なのかが判りません。
+多くのデータベースでは、データベースを操作する時の入力パラメタに、決まった形式でデータを指定せねばなりません。
+例えば、入力が ``DATE`` 型のカラム用なら、データベースごとに指定の日付フォーマットにせねばなりません。
+"Row ID" カラムや、巨大なバイナリ要素 (blob や ``RAW`` カラム) にも、同様の問題があります。
+これは Python では問題で、というのも ``executeXXX()`` メソッドのパラメタには型の制約がないからです。
+データベースモジュールとしては、引数に Python の文字列オブジェクトが渡されてきても、データを単なる ``CHAR`` カラムにすればよいのか、 ``BINARY`` なのか、はたまた ``DATE`` が適切なのか判らないのです。
 
-この問題を解決するために、モジュールでは以下に示すようなコンストラ
-クタを提供し、特殊な値を保持できるオブジェクトを生成できるようにし
-なければなりません。コンストラクタをカーソルメソッドに渡すと、モジュ
-ールは入力パラメタの適切な型を検出し、それに従った値を結びつけるこ
-とができます。
+この問題を解決するために、 DB-API モジュールは、特殊な値を保持できるオブジェクト（型オブジェクト）を生成するためのコンストラクタを提供せねばなりません。
+型オブジェクトをカーソルメソッドに渡すと、モジュールは型オブジェクトを使って、入力パラメタの適切な型を検出し、それに従った値をデータベース操作の入力にします。
 
-カーソルオブジェクトの description 属性は、クエリ結果の各カラムに
-関する情報を返します。 type_code は以下に示す型オブジェクトのいず
-れか一つと等しくならなければなりません (例えば、DATETIME は date,
-time および timestamp カラムと等しくなるはずです; 詳細については、
-以下の実装に関するヒント: Impementation Hints を参照してください)。
+クエリの結果を取得する際は、 `カーソル <Cursor>`_ オブジェクトの `.description`_ 属性が、各カラムに関する情報を返します。
+`description` の ``type_code`` は、以下に示す型オブジェクトのいずれか一つに対応していなければなりません。
+一方、一つの型オブジェクトが、複数の ``type_code`` に結びついていてもかまいません。(例えば、 ``DATETIME`` が date, time および timestamp のカラムに対応している場合があります。詳細は、 `実装のヒント <Impementation Hints>`_ を参照してください)。
 
-モジュールでは、以下のコンストラクタと単集合 (singleton) を公開し
-ます:
+モジュールは、以下のコンストラクタとシングルトンを公開します:
+
+.. _Date:
     
-    Date(year,month,day)
+`Date(year,month,day)`
 
-        この関数は日付値を保持できるオブジェクトを生成します。
-        
-    Time(hour,minute,second)
+    日付値を保持するオブジェクトを生成します。
+    
+.. _Time:
 
-        この関数は時刻値を保持できるオブジェクトを生成します。
-        
-    Timestamp(year,month,day,hour,minute,second)
+`Time(hour,minute,second)`
 
-        この関数はタイムスタンプを保持できるオブジェクトを生成しま
-        す。
+    時刻値を保持するオブジェクトを生成します。
+    
+.. _Timestamp:
 
-    DateFromTicks(ticks)
+`Timestamp(year, month, day, hour, minute, second)`
 
-        この関数は指定した ticks 値 (epoch からの経過秒数; 詳細は
-        標準の Python time モジュールドキュメントを参照してくださ
-        い) で表された日付値を保持できるオブジェクトを生成します。
+    タイムスタンプを保持するオブジェクトを生成します。
 
-    TimeFromTicks(ticks)
-      
-        この関数は指定した ticks 値 (epoch からの経過秒数; 詳細は
-        標準の Python time モジュールドキュメントを参照してくださ
-        い) で表された時刻値を保持できるオブジェクトを生成します。
-        
-    TimestampFromTicks(ticks)
+.. _DateFromTicks:
 
-        この関数は指定した ticks 値 (epoch からの経過秒数; 詳細は
-        標準の Python time モジュールドキュメントを参照してくださ
-        い) で表されたタイムスタンプ値を保持できるオブジェクトを生
-        成します。
+`DateFromTicks(ticks)`
 
-    Binary(string)
-      
-        この関数はバイナリ形式の (長い) 文字列を保持できるオブジェ
-        クトを生成します。
-        
+    ticks の指定値を epoch からの経過秒数としたときの日付値を保持するオブジェクトを生成します (詳細は、 `標準の Python time モジュール <http://docs.python.org/library/time.html>`_ のドキュメントを参照してください)。
 
-    STRING
+.. _TimeFromTicks:
 
-        この型オブジェクトはデータベース上の文字列ベースのカラム
-        (CHAR 等) を記述するために用いられます。
+`TimeFromTicks(ticks)`
+  
+    ticks の指定値を epoch からの経過秒数としたときの時刻値を保持するオブジェクトを生成します(詳細は、 `標準の Python time モジュール <http://docs.python.org/library/time.html>`_ のドキュメントを参照してください)。
 
-    BINARY
+.. _TimestampFromTicks:
 
-        この型オブジェクトはデータベース上の (長い) バイナリデータ
-        カラム (LONG, RAW, BLOB 等) を記述するために用いられます。
-        
-    NUMBER
+`TimestampFromTicks(ticks)`
 
-        この型オブジェクトはデータベース上の数値カラムを記述するた
-        めに用いられます。
+    ticks の指定値を epoch からの経過秒数としたときのタイムスタンプ値を保持するオブジェクトを生成します(詳細は、 `標準の Python time モジュール <http://docs.python.org/library/time.html>`_ のドキュメントを参照してください)。
 
-    DATETIME
-      
-        この型オブジェクトはデータベース上の date/time カラムを記
-        述するために用いられます。
-        
-    ROWID
-      
-        この型オブジェクトはデータベース上の "Row ID" カラムを記述
-        するために用いられます。
-        
-入出力における SQL NULL 値は Python の単集合 None で表されます。
+.. _Binary:
 
-Note: Unix の ticks は、カバーしている日付範囲が限られているため、
-データベースインタフェースに用いるとトラブルを引き起こすことがあり
-ます。
+`Binary(string)`
+  
+    バイナリ形式の (長い) 文字列を保持するオブジェクトを生成します。
+
+.. _STRING:
+
+`STRING`
+
+    (``CHAR`` 型などの) 文字列系のカラムの表現に使われます。
+
+.. _Binary type:
+
+`BINARY`
+
+    (長い) バイナリデータのカラム (``LONG``, ``RAW``, ``BLOB`` 等) の表現に使われます。
+    
+.. _NUMBER:
+
+`NUMBER`
+
+    数値カラムの表現に使われます。
+
+.. _DATETIME:
+
+`DATETIME`
+  
+    date/time カラムの表現に使われます。
+    
+.. _ROWID:
+
+`ROWID`
+  
+    "Row ID" カラムの表現に使われます。
+            
+SQL の ``NULL`` 値は、入力側、出力側のどちらでも、 Python のシングルトン ``None`` で表現します。
+
+.. Note:: 
+    古い Unix の ticks は表現できる日付の範囲が限られているので、データベースインタフェースに用いるとトラブルを引き起こすことがあります。
 
 .. _Implementation Hints for Module Authors:
 
 モジュール作者のための実装ヒント 
 ==================================
 
-* date/time オブジェクトに対するオブジェクト型として、mxDateTime
-  パッケージで定義されているものを推奨します。このオブジェクト型は
-  必要なコンストラクタやメソッド全てを Python および C の両方のレ
-  ベルで提供しています。
+* date/time オブジェクトは `Python の datetime モジュール <http://docs.python.org/library/datetime.html>`_ のオブジェクト (Python 2.3 から、 C API は 2.4 から) か、 `mxDateTime <http://www.egenix.com/products/python/mxBase/mxDateTime/>`_ パッケージ (Python 1.5.2 から利用可能) で実装できます。いずれも、必要なコンストラクタとメソッドを Python および C の両方のレベルで提供しています。
     
-* Binary オブジェクトに対するオブジェクト型としては、Python 1.5.2
-  以降から利用できる buffer 型を推奨します。詳細は Python ドキュメ
-  ンテーションを参照してください。C インタフェースに関する情報は、
-  Python ソース配布物中の Include/bufferobject.h および
-  Objects/bufferobject.c を参照してください。
-
 * Python 2.3 からは、モジュール作者は標準の datetime モジュールで
   定義されているオブジェクト型を使うことができます。しかし、この方
   法では mxDateTime が提供しているような C API を公開していません。
   従って、C ベースのデータベースモジュールの組み込みがより難しいこ
   とになります。
 
-* 以下に Unix の ticks に基づき、汎用のコンストラクタに処理を任せ
-  るサンプル実装を示します:
+* 以下は、 Unix の ticks を使う date/time コンストラクタの例です。
+  汎用のコンストラクタに処理を移譲しています::
 
     import time
 
     def DateFromTicks(ticks):
-        return apply(Date,time.localtime(ticks)[:3])
+        return Date(*time.localtime(ticks)[:3])
 
     def TimeFromTicks(ticks):
-        return apply(Time,time.localtime(ticks)[3:6])
+        return Time(*time.localtime(ticks)[3:6])
 
     def TimestampFromTicks(ticks):
-        return apply(Timestamp,time.localtime(ticks)[:6])
+        return Timestamp(*time.localtime(ticks)[:6])
 
-* 以下の Python クラスを使うと、description の型コードとして複数の
-  型オブジェクトの値がとりうる場合でも、上記の型オブジェクトを実装
-  できるようになります:
+* Binary オブジェクトに対するオブジェクト型としては、Python 1.5.2 以降で利用できる buffer 型を推奨します。
+  詳細は Python ドキュメンテーションを参照してください。
+  C インタフェースに関する情報は、 Python ソース配布物中の ``Include/bufferobject.h`` および ``Objects/bufferobject.c`` を参照してください。
 
-    class DBAPITypeObject:
-        def __init__(self,*values):
-            self.values = values
-        def __cmp__(self,other):
-            if other in self.values:
-                return 0
-            if other < self.values:
-                return 1
-            else:
-                return -1
+* 以下の Python クラスのように実装すると、 `.description`_ 内の `type_code`_ フィールドが複数の型オブジェクトに対応している場合でも動作します::
 
-  生成される型オブジェクトは、コンストラクタに渡された全ての型オブ
-  ジェクト値と等価になります。
+      class DBAPITypeObject:
+          def __init__(self,*values):
+              self.values = values
+          def __cmp__(self,other):
+              if other in self.values:
+                  return 0
+              if other < self.values:
+                  return 1
+              else:
+                  return -1
 
-* 上記の例外クラス階層を実装した Python コードの一部を以下に示しま
-  す:
+  この型オブジェクトは、値を比較するとき、コンストラクタに予め渡した値全てに対して等値の結果を返します。
+
+* 例外クラス階層を実装した Python コードの一部を以下に示します::
 
     import exceptions
 
@@ -561,147 +607,130 @@ Note: Unix の ticks は、カバーしている日付範囲が限られてい�
     class NotSupportedError(DatabaseError):
         pass
     
-  C 言語を使っているなら、PyErr_NewException(fullname, base, NULL)
-  API で例外オブジェクトを生成できます。
+  C 言語を使っているなら、 ``PyErr_NewException(fullname, base, NULL)`` API で例外オブジェクトを生成できます。
 
+.. _Optional DB API Extensions:
 
 オプションの DB-API 拡張
 ==========================
 
-DB API 2.0 ができてから現在まで、モジュールの作者はしばしば本 DB
-API 仕様で要求されている内容を超えた実装を行ってきました。互換性を
-高め、本仕様を将来のバージョンに問題なくアップグレードする道筋を提
-供するために、この節ではコアの DB API 2.0 仕様に対して広く行われて
+DB API 2.0 ができてから現在まで、モジュールの作者達は、たびたび本 DB API 仕様の範囲超えた実装を行ってきました。
+互換性を高め、本仕様を将来のバージョンに問題なくアップグレードする道筋を提供するために、この節ではコアの DB API 2.0 仕様に対して広く行われて
 いる一連の拡張について定義します。
 
-DB API の全てのオプション機能と同様、データベースモジュールの作者
-はこれらの追加属性やメソッドを (AttributeError になるようにしてお
-いて) 実装しなかったり、 NotSupportedError を発行して、実行時に属
-性やメソッドが利用可能かどうかを調べられるだけにしておくのは自由で
-す。
+DB API の全てのオプション機能と同様、データベースモジュールの作者は、これらの追加属性やメソッドを (``AttributeError`` になるようにしておいて) 実装しなかったり、実行時に属性やメソッドが利用可能かどうかを調べた上で、 NotSupportedError_ を発行してよいことになっています。
 
-Python の warning フレームワークを介して警告を出し、これらの拡張が
-プログラマからオプションで見えるようにするよう提案がなされています。
-この機能を有用にするためには、警告メッセージを標準化して、メッセー
-ジをマスクできるようにしなければなりません。これらの標準メッセージ
-は以下の "警告メッセージ" で触れています。
+現在、 Python の warning フレームワークを介して警告を出し、これらの拡張がプログラマからオプションで見えるようにする提案があります。
+この機能を有用にするためには、警告メッセージを標準化して、メッセージのマスクを可能にせねばなりません。
+こうした標準メッセージは以下の *警告メッセージ* で触れています。
 
-cursor 属性 .rownumber
+.. _.rownumber:
 
-    読み出し専用の属性で、結果セット中のカーソルの位置をゼロから始
-    まるインデクスで与えるか、インデクスが決定できない場合には
-    None でなければなりません。
+`Cursor.rownumber`
 
-    インデクスは (結果セットの) 配列中でカーソルが位置するインデク
-    スとみなされます。次の fetch 操作では、配列中の .rownumber で
-    インデクス指定された行を取得することになります。
+    読み出し専用の属性で、結果セット中のカーソルの位置をゼロから始まるインデクスで返すか、インデクスが決定できない場合には ``None`` を返さねばなりません。
 
-    警告メッセージ: "DB-API extension cursor.rownumber used"
+    インデクスは配列 (結果セット) 中のカーソルの位置を表すインデクスです。
+    次に fetch 操作を行なうと、配列中の ``.rownumber`` 番目の行データを返します。
 
-connection 属性 .Error, .ProgrammingError, など
+    *警告メッセージ:* "DB-API extension cursor.rownumber used"
 
-    DB API 標準で定義されている、(モジュールのスコープ内で利用でき
-    る例外の他に) コネクションオブジェクト上で公開されている例外クラスは、
-    全てコネクションオブジェクトの属性になっています。
+.. _Connection.Error:
+.. _Connection.ProgrammingError:
 
-    これらの属性値は複数の接続を扱う環境でのエラー処理を単純化しま
-    す。
+`Connection.Error`, `Connection.ProgrammingError` など
 
-    警告メッセージ: "DB-API extension connection.<exception> used"
+    DB API 標準で定義している全例外は、 (モジュールのスコープだけでなく) コネクションオブジェクトの属性としてアクセスできねばなりません。
 
-cursor 属性 .connection
+    Connection の属性になっていると、複数の接続を扱う環境でエラー処理が簡単になります。
 
-    読み出し専用の属性で、カーソルを生成したコネクションオブジェクトへの参
-    照を返します。
+    *警告メッセージ:* "DB-API extension connection.<exception> used"
 
-    この属性値は、複数の接続を扱う環境での、多態性コード
-    (polymorph code) の実装を単純化します。
+.. _.connection:
 
-    警告メッセージ: "DB-API extension cursor.connection used"
+`Cursor.connection`
 
-cursor メソッド .scroll(value[,mode='relative'])
+    読み出し専用の属性で、カーソルの生成に使ったコネクションオブジェクトへの参照を返します。
 
-    結果セット中のカーソルをスクロールさせ、mode からの相対で表し
-    た新たな位置に設定します。
+    この属性値は、複数の接続を扱う環境で、コードの多態化 (polymorph) を簡単に実装できるようにします。
 
-    mode が 'relative' (デフォルト値) の場合、値は現在の結果セット
-    中の位置からの相対とみなされます。 'absolute' の場合には、
-    値は対象の絶対位置を示します。
+    *警告メッセージ:* "DB-API extension cursor.connection used"
 
-    スクロール操作によって、結果セットの外側に出てしまうような場合、
-    IndexError が発行されなければなりません。この場合、カーソル位
-    置がどうなるかは未定義とされています (全くカーソルを動かさない
-    のが理想的でしょう)。
+.. _.scroll:
+.. _.scroll():
 
-    Note: このメソッドは、ネイティブのスクロール可能カーソルが利用
-    可能ならそれを使い、そうでなければ先送りのみ (forward-only) の
-    カーソルエミュレーションに切り替えるようにすべきです。このメソッ
-    ドで NotSupportedErrors を発行して、データベースが (まき戻しス
-    クロール: backward scroll のような) 特定の操作をサポートしてい
-    ない旨を示すようにしてもかまいません。 
+`Cursor.scroll(value[,mode='relative'])`
 
-    警告メッセージ: "DB-API extension cursor.scroll() used"
+    結果セット中のカーソルをスクロールさせ、mode からの相対で表した新たな位置に設定します。
 
-cursor 属性 .messages
+    mode が ``relative`` (デフォルト値) の場合、 value は結果セット中のカーソルの現在位置からの相対です。 ``absolute`` の場合には、 value は絶対位置です。
 
-    Python リストオブジェクトで、データベースインタフェースが現在
-    のカーソルを通じて根底にあるデータベースから受け取った全てのメッ
-    セージに対するタプル  (exception class, exception value) を追
-    加するためのものです。
+    スクロール操作によって結果セットの外側に出てしまうような場合、 ``IndexError`` を送出せねばなりません。その場合のカーソル位置は未定義です (全くカーソルを動かさないのが理想的でしょう)。
 
-    リストは全て .fetchXXX() を除く標準の cursor メソッドを呼び出
-    した際に、過度のメモリ使用を避けるために (呼び出しを実際に行う
-    前に) 消去されます。リストは "del cursor.messages[:]" を実行し
-    ても消去できます。
+    .. Note::
+       このメソッドは、ネイティブのカーソルがスクロール可能ならそれを使い、そうでないときは、先送りスクロールのみ (forward-only) のカーソルエミュレーションに切り替えてください。
+       データベースがスクロールの一部の機能 (巻き戻しスクロールなど) をサポートしていない場合は、 NotSupportedError_ を送出してかまいません。
 
-    データベースから生成されたエラーおよび警告メッセージはこのリス
-    ト内に置かれるので、ユーザはリストを調べることで、メソッド呼び
-    出しによって操作が正しく行われたかどうか確認することができます。
+    *警告メッセージ:* "DB-API extension cursor.scroll() used"
+
+
+.. _Cursor.messages:
+
+`Cursor.messages`
+
+    Python のリストオブジェクトです。データベースインタフェースは、このカーソルのアクセス先のデータベースから受信した全てのメッセージを、このリストに (exception class, exception value) の形式で追加します。
     
-    この属性の意義は、warning 例外がしばしば問題を引き起こすのを抑
-    制することにあります (いくつかの警告は単に報告のための文字列し
-    か入っていません)。
+    このリストは、メモリの使いすぎを防ぐため、 `.fetch*()`_ 以外の標準のカーソルメソッドを呼び出すたび、(呼び出しに先立って) 自動的に消去されます。
+    ``del cursor.messages[:]`` でも消去できます。
+
+    データベースの生成したエラーや警告メッセージ全てがこのリストに入るので、ユーザはリストを調べることで、メソッド呼び出しでデータベース操作が正しく行われたかどうか確認できます。
+    
+    この属性のねらいは、(単なる情報しか入っていないような) Warning 例外がたくさん送出されて問題を引き起こすのを防ぐことにあります。
 
     警告メッセージ: "DB-API extension cursor.messages used"
 
-connection 属性 .messages
+
+.. _Connection.messages:
+
+`Connection.messages`
 
     コネクションオブジェクト用であることを除き、cursor.messages と同じです。
 
-    リストは全て標準の connection メソッドを呼び出した際に、過度の
-    メモリ使用を避けるために (呼び出しを実際に行う前に) 消去されま
-    す。リストは "del cursor.messages[:]" を実行しても消去できます。
+    このリストは、メモリの使いすぎを防ぐため、接続オブジェクトの標準のメソッドを呼び出すたび、(呼び出しに先立って) 自動的に消去されます。
+    ``del connection.messages[:]`` でも消去できます。
 
     警告メッセージ: "DB-API extension connection.messages used"
 
-cursor メソッド .next()
+.. _.next:
+.. _.next():
 
-    現在実行中の SQL 文から、 .fetchone() と同じ動作を行って次の行
-    を返します。 Python バージョン 2.2 以降では、結果セットが読み
-    尽くされた際には StopIteration 例外が発行されます。それ以前の
-    バージョンには StopIteration 例外がないので、代わりに
-    IndexError を発行すべきです。
+`Cursor.next()`
+
+    現在実行中の SQL 文について、結果セットの次の行を取得して返します。
+    `.fetchone()`_ と同じ意味です。
+    Python バージョン 2.2 以降では、結果セットを読み尽くすと ``StopIteration`` 例外を送出します。
+    それ以前のバージョンには ``StopIteration`` 例外がないので、代わりに ``IndexError`` を送出せねばなりません。
 
     警告メッセージ: "DB-API extension cursor.next() used"
 
-cursor メソッド .__iter__()
+.. _.__iter__:
+.. _.__iter__():
 
-    カーソルを反復処理プロトコル (iteration protocol) 互換にするた
-    めに、自分自身を返します。
+`Cursor.__iter__()`
+
+    カーソルをイテレーションプロトコル互換にするために、自分自身を返します。 [8]_
 
     警告メッセージ: "DB-API extension cursor.__iter__() used"
 
-cursor 属性 .lastrowid
+.. _.lastrowid:
 
-    最後に変更が行われた行の rowid を提供する読み出し専用の属性で
-    す (ほとんどのデータベースでは、 INSERT 操作が一度行われたとき
-    のみ rowid を返します)。操作によって rowid が設定されなかった
-    場合や、データベースが rowid をサポートしていない場合、この属
-    性値は None に設定されるようにすべきです。
+`Cursor.lastrowid`
 
-    INSERT を .executemany() で用いたときのように、最後に実行した
-    文で一つより多くの行が更新された場合には、.lastrowid の動作は
-    未定義となります。
+    読み出し専用の属性です。
+    最後に変更が行われた行の ``rowid`` を返します  (大半のデータベースは、 ``INSERT`` 操作が一度行われたときのみ、 ``rowid`` を返します)。
+    操作によって ``rowid`` が設定されなかった場合や、データベースが rowid をサポートしていない場合、この属性値を ``None`` にせねばなりません。
+
+    ``INSERT`` を ``.executemany()`` で用いたときのように、最後に実行した文が二つ以上の行を変更した場合の ``.lastrowid`` は未定義です。
 
     警告メッセージ: "DB-API extension cursor.lastrowid used"
 
@@ -711,40 +740,44 @@ cursor 属性 .lastrowid
 オプションのエラー処理拡張 
 ============================
 
-コアの DB API 仕様では、ユーザにエラーを報告するために発行される例
-外だけを紹介しています。しかし場合によっては、例外を使うとプログラ
-ムの流れをとめてしまったり、実行不能にしてしまったりします。
+コアの DB API 仕様は、一連の例外を定義して、ユーザにエラーを報告したいときに送出できるようにしています。
+しかし、状況によっては、例外を使うとプログラムの流れをとめてしまったり、実行不能にしてしまったりします。
 
-こうした場合に対処し、かつデータベースに関わるエラー処理を単純化す
-るために、データベースモジュールの作者はユーザ定義可能なエラーハン
-ドラを実装できるようにしてもかまいません。この節では、そうしたエ
-ラーハンドラを定義する標準的な方法について述べます。
+そうした場合に対処し、かつ、データベースに関わるエラー処理を簡単にするため、データベースモジュールの作者は、ユーザにエラーハンドラを実装できる仕組みを提供してもかまいません。
+この節では、エラーハンドラを定義する標準的な方法について述べます。
 
-cursor/connection 属性 .errorhandler
+.. _Connection.errorhandler:
+.. _Cursor.errorhandler:
+
+`Connection.errorhandler`, `Cursor.errorhandler` 
 
    エラー条件に遭遇した際に呼び出されるエラーハンドラを参照する、
    読み書き可能な属性です。
 
-   このハンドラは Python の呼び出し可能オブジェクトで、以下ように引数をとらねばなりません: errorhandler(connection, cursor, errorclass, errorvalue) ここで、 connection はカーソルが操作しているコネクションオブジェクトへの参照、 cursor は カーソルへの参照 (エラーがカーソルに関係しない場合には None)、errorclass は
-   エラーオブジェクトのクラス、errorvalue は errorclass のインスタンスを生成するときに指定する引数です。
+   このハンドラは Python の呼び出し可能オブジェクトで、以下のように引数をとらねばなりません:
+   
+   .. parsed-literal::
 
-   標準的なエラーハンドラでは、エラー情報を適切なオブジェクトの .message 属性 (connection.messages または cursor.messages) に追加させるべきです。
-   また、与えられた errorclass と errorvalue パラメタで定義された例外を発行するようにすべきです。
+       errorhandler(connection, cursor, errorclass, errorvalue)
 
-   errorhandler が設定されていない場合 (属性が None)、上で概説したエラー処理手順が適用されるようにすべきです。
+   ここで、 *connection* はカーソルが操作しているコネクションオブジェクトへの参照、 *cursor* は カーソルへの参照 (エラーがカーソルに関係しない場合には None)、 *errorclass* はエラーオブジェクトを生成するのに使ったクラス、 *errorvalue* はエラーオブジェクトを生成するときに使った引数です。
+
+   標準のエラーハンドラは、エラー情報を適切なオブジェクトの ``.message`` 属性 (`Connection.messages`_ または `Cursor.messages`_) に追加せねばなりません。
+   また、 *errorclass* と *errorvalue* パラメタに従って例外を送出せねばなりません。
+
+   ``.errorhandler`` が設定されていない場合 (属性が ``None`` の場合) は、上で説明したような標準のエラー処理手順を適用せねばなりません。
 
    警告メッセージ: "DB-API extension .errorhandler used"
 
-コネクションオブジェクトからカーソルを生成する際、カーソルは .errorhandler
-の設定を受け継ぐようにすべきです。
+コネクションオブジェクトからカーソルを生成する際、カーソルに ``.errorhandler`` の設定を受け継がせてください。
 
 
 .. _`Optional Two-Phase Commit Extensions`:
 
-オプションの2フェーズコミット拡張
-===================================
+オプションの2フェーズコミット (TPC) 拡張
+===========================================
 
-多くのデータベースが、2フェーズコミットをサポートしています。
+多くのデータベースが、2フェーズコミット (TPC: Two-Phase Commit) をサポートしています。
 2フェーズコミットは、複数のデータベース接続や、他のリソースにまたがるようなトランザクションを扱えるようにします。
 
 データベースバックエンドが2フェーズコミットをサポートし、かつデータベースモジュールの作者がこの機能を公開したいなら、以下のAPIを実装してください。
@@ -755,41 +788,35 @@ cursor/connection 属性 .errorhandler
 TPCトランザクションID
 ----------------------
 
-As many databases follow the XA specification, transaction IDs are
-formed from three components:
+X/Open XA 仕様に準拠している多くのデータベースにならって、トランザクション ID は3つのコンポーネントで成り立っています:
 
-* a format ID
-* a global transaction ID
-* a branch qualifier
+* フォーマット ID (format ID)
+* グローバルトランザクション ID (global transaction ID)
+* ブランチ修飾子 (branch qualifier)
 
-For a particular global transaction, the first two components should
-be the same for all resources.  Each resource in the global
-transaction should be assigned a different branch qualifier.
+一つのグローバルトランザクションの中で、上の最初の二つのコンポーネントは、全リソース間で同じでなければなりません。
+グローバルトランザクション中の各リソースには、それぞれ別々のブランチ修飾子を結び付けねばなりません。
 
-The various components must satisfy the following criteria:
+それぞれのコンポーネントは、以下の要件を満たさねばなりません:
 
-* format ID: a non-negative 32-bit integer.
+* フォーマット ID: 非負の 32 ビットの整数
 
-* global transaction ID and branch qualifier: byte strings no
-  longer than 64 characters.
+* グローバルトランザクション ID とブランチ修飾子: 64文字を超えないバイト文字列
 
-Transaction IDs are created with the `.xid()`_ Connection method:
+トランザクション ID はコネクションのメソッド  `.xid()`_ で生成します:
 
 
 .. _.xid:
 .. _.xid():
 
 `.xid`_\ (*format_id*, *global_transaction_id*, *branch_qualifier*)
-    Returns a transaction ID object suitable for passing to the
-    `.tpc_*()`_ methods of this connection.
+    トランザクション ID オブジェクトを返します。
+    このトランザクション ID は、コネクションの `.tpc_*()`_ メソッドに渡せます。
 
-    If the database connection does not support TPC, a
-    NotSupportedError_ is raised.
+    データベース接続が TPC をサポートしない場合は、 NotSupportedError_ を送出します。
 
-    The type of the object returned by `.xid()`_ is not defined, but
-    it must provide sequence behaviour, allowing access to the three
-    components.  A conforming database module could choose to
-    represent transaction IDs with tuples rather than a custom object.
+    `.xid()`_ の返すオブジェクトの型に特に指定はありませんが、3つのコンポーネントにアクセスできるよう、配列のような振る舞いをせねばなりません。
+    現在 TPC に対応しているデータベースは、トランザクション ID の表現に、カスタムオブジェクトではなく、タプルを使っています。
 
 
 .. _`TPC Connection Methods`:
@@ -804,113 +831,88 @@ TPC コネクションメソッド
 .. _.tpc_begin():
 
 `.tpc_begin`_\ (*xid*)
-    Begins a TPC transaction with the given transaction ID *xid*.
+     *xid* に指定したトランザクション IDで TPC トランザクションを開始します。               
 
-    This method should be called outside of a transaction (*i.e.*
-    nothing may have executed since the last `.commit()`_ or
-    `.rollback()`_).
+    このメソッドはトランザクションの外 (たとえば、最後の `.commit()`_ や `.rollback()`_ の呼び出し以降、一切 `.execute()`_ 実行していない状態です) で呼び出さねばなりません。
 
-    Furthermore, it is an error to call `.commit()`_ or `.rollback()`_
-    within the TPC transaction. A ProgrammingError_ is raised, if the
-    application calls `.commit()`_ or `.rollback()`_ during an active
-    TPC transaction.
+    さらに、TPC トランザクション中で `.commit()`_ や `.rollback()`_ を呼んだ場合もエラーになります。
+    TPC トランザクション中にアプリケーションが `.commit()`_ や `.rollback()`_ を呼んだ場合は、 ProgrammingError_ を送出せねばなりません。
 
-    If the database connection does not support TPC, a
-    NotSupportedError_ is raised.
+    データベース接続が TPC をサポートしない場合は、 NotSupportedError_ を送出せねばなりません。
 
 
 .. _.tpc_prepare:
 .. _.tpc_prepare():
 
 `.tpc_prepare`_\ ()
-    Performs the first phase of a transaction started with
-    `.tpc_begin()`_.  A ProgrammingError_ should be raised if this
-    method outside of a TPC transaction.
+    `.tpc_begin()`_ で開始したトランザクションの第一フェーズを実行します。
+    TPC トランザクションの外でこのメソッドを呼んだ場合は、 ProgrammingError_ を送出せねばなりません。
 
-    After calling `.tpc_prepare()`_, no statements can be executed
-    until `.tpc_commit()`_ or `.tpc_rollback()`_ have been called.
+    `.tpc_prepare()`_ を呼び出した後は、 `.tpc_commit()`_ または `.tpc_rollback()`_ を呼び出すまで `.execute()`_ を実行できません。
 
 
 .. _.tpc_commit:
 .. _.tpc_commit():
 
 `.tpc_commit`_\ ([ *xid* ])
-    When called with no arguments, `.tpc_commit()`_ commits a TPC
-    transaction previously prepared with `.tpc_prepare()`_.
+    引数なしで呼び出すと、 `.tpc_commit()`_ は直前の `.tpc_prepare()`_ で準備した TPC トランザクションをコミットします。
 
-    If `.tpc_commit()`_ is called prior to `.tpc_prepare()`_, a single
-    phase commit is performed.  A transaction manager may choose to do
-    this if only a single resource is participating in the global
-    transaction.
+    `.tpc_prepare()`_ よりも前に `.tpc_commit()`_ を呼び出すと、シングルフェーズのコミットを実行します。
+    トランザクションマネジャは、グローバルトランザクションに参加しているリソースが一つの場合にのみ、この動作を許可してください。
 
-    When called with a transaction ID *xid*, the database commits the
-    given transaction.  If an invalid transaction ID is provided, a
-    ProgrammingError_ will be raised.  This form should be called
-    outside of a transaction, and is intended for use in recovery.
+    トランザクションID *xid* を指定して呼び出すと、指定のトランザクションをコミットします。
+    無効なトランザクション ID を指定すると、 ProgrammingError_ を送出します。
+    *xid* 指定の形式は復旧用で、トランザクションの外で実行せねばなりません。
 
-    On return, the TPC transaction is ended.
-
+    このメソッドが処理を戻したら、TPC トランザクションは終了します。
+    
 
 .. _.tpc_rollback:
 .. _.tpc_rollback():
 
 `.tpc_rollback`_\ ([ *xid* ])
-    When called with no arguments, `.tpc_rollback()`_ rolls back a TPC
-    transaction.  It may be called before or after `.tpc_prepare()`_.
+    
+    引数なしで呼び出すと、 `.tpc_rollback()`_ は直前の `.tpc_prepare()`_ で準備した TPC トランザクションをコミットします。
 
-    When called with a transaction ID *xid*, it rolls back the given
-    transaction.  If an invalid transaction ID is provided, a
-    ProgrammingError_ is raised.  This form should be called outside
-    of a transaction, and is intended for use in recovery.
+    トランザクションID *xid* を指定して呼び出すと、指定のトランザクションをロールバックします。
+    無効なトランザクション ID を指定すると、 ProgrammingError_ を送出します。
+    *xid* 指定の形式は復旧用で、トランザクションの外で実行せねばなりません。
 
-    On return, the TPC transaction is ended.
+    このメソッドが処理を戻したら、TPC トランザクションは終了します。
 
 .. _.tpc_recover:
 .. _.tpc_recover():
 
 `.tpc_recover`_\ ()
-    Returns a list of pending transaction IDs suitable for use with
-    ``.tpc_commit(xid)`` or ``.tpc_rollback(xid)``.
+    ``.tpc_commit(xid)`` や ``.tpc_rollback(xid)`` で復旧するために、解決待ちのトランザクション ID を返します。
 
-    If the database does not support transaction recovery, it may
-    return an empty list or raise NotSupportedError_.
+    データベースがトランザクション復旧をサポートしていない場合は、空のリストを返すか、 NotSupportedError_ を送出してください。
 
 
 .. _Frequently Asked Questions:
 
-よく寄せられる質問
-====================
+よくある質問
+==============
 
-データベース SIG では、しばしば DB API 仕様に関して繰り返しなされ
-る質問があります。この節では、人々がこの仕様に関して直面するいくつ
-かの問題についてカバーします。
+データベース SIG には、 DB API 仕様についての質問が何度も繰り返し寄せられます。
+この節では、ユーザがこの仕様についてたびたび抱く疑問を扱って言います。
 
 **質問:**
 
-.fetchxxx() から返されるタプルを使って辞書を構築するにはどうし
-たらよいですか:
+`.fetch*()`_ の返すタプルから辞書を構築するには、どうすればよいですか。
 
 **回答:**
 
-このような操作に対するヘルパー機能を提供するツールはいくつかあ
-ります。それらのツールのほとんどが、カーソル属性 .description
-で定義されているカラム名を辞書作成時のキーとして使っています。
+この手の操作に対するヘルパー機能を提供するツールがいくつかあります。
+そうしたツールのほとんどが、カーソルの ``.description`` 属性の中で定義されているカラム名を使って、レコード行単位で辞書を構築しています。
 
-DB API 仕様で .fetchxxx() メソッドの戻り値として辞書をサポート
-するよう拡張しない理由は、そのアプローチには以下のような欠点が
-あるからだということに注意してください:
+ `.fetch*(()` メソッドの戻り値として辞書をサポートするように DB-API を拡張しないのは、以下のような問題点があるからです:
 
-* データベースによっては、カラム名の大小文字を区別しなかったり、
-  カラム名を全て大文字や全て小文字の文字列に変換してしまいます。
+* データベースによっては、カラム名の大小文字を区別しなかったり、カラム名を全て大文字や全て小文字の文字列に変換するので、辞書のキーが一意になりません。。
 
-* クエリ (すなわち SQL 関数) によって生成された結果セット中のカ
-  ラムは、テーブルのカラム名と対応付けがとれず、データベースが
-  こうしたカラムに名前をつけるやりかたはデータベース毎の独自性
-  が非常に高いものとなっています。
+* クエリの中で (SQL の関数などで) で生成した結果セットのカラムは、テーブルのカラム名と直接対応しておらず、データベースがこうしたカラムに名前を付ける方法がデータベースごとに独特で、一意になりません。
 
-結論として、辞書キーを介したカラムへのアクセス方法はデータベー
-ス間で異なったものとなってしまい、可搬性のあるコードを書けなく
-してしまいます。
+結論として、辞書キーを介してカラムにアクセスする方法が、データベース間で異なったものとなってしまうので、可搬性のあるコードを書けなくなってしまいます。
 
 
 .. _Major Changes from Version 1.0 to Version 2.0:
@@ -918,40 +920,26 @@ DB API 仕様で .fetchxxx() メソッドの戻り値として辞書をサポー
 1.0 から 2.0 への主要な変更
 =============================
 
-Python データベース API 2.0 では、1.0 に対していくつかの大きな変更
-が加えられています。これらの変更のうちいくつかは、既存の DB API
-1.0 に基づいて書かれたスクリプトを動かなくしてしまうので、それらの
-変更を反映させるためにバージョン番号が変えられました。
+DB-API 2.0 には、1.0 から大きな変更がいくつか追加されています。
+変更のうちいくつかは、既存の DB API 1.0 用に書いたスクリプトを動かなくしてしまうので、変更を反映させるためにバージョン番号が変えられました。
     
 1.0 から 2.0 への最も重要な変更は、以下のとおりです:
     
-* dbi モジュールは必要でなくなり、その機能はモジュールインタ
-  フェース自体に統合されました。
+* 別途 dbi モジュールを用意する必要がなくなり、 dbi の機能はモジュールインタフェース自体に統合されました。
 
-* 新たなコンストラクタと型オブジェクトが date/time 値に対して
-  追加され、RAW 型オブジェクトは BINARY に名前を変更しました。
-  これにより、近代的な SQL データベースで広く使われている基本
-  データ型すべてをカバーするようなセットになったはずです。
+* date/time 値用の新たなコンストラクタと `型オブジェクト <Type Objects>`_ が追加されました。また、 ``RAW`` 型オブジェクトは ``BINARY`` に名前を変更しました。
+  これにより、今時の SQL データベースで広く使われている基本データ型すべてをカバーするようなセットになったはずです。
 
-* 新たな定数 (apilevel, threadlevel, paramstyle) およびメソッ
-  ド (executemany, nextset) が追加され、データベースとの結びつ
-  きが改善されました。
+* 新たな定数 (apilevel_, threadsafety_, paramstyle_) とメソッド (`executemany()`_, `nextset()`_) が追加され、データベースとの結びつきが改善されました。
     
-* ストアドプロシジャを呼び出すために必要な .callproc() の動作
-  が明確に定義されました。
+* ストアドプロシジャを呼び出すために必要な `.callproc()`_ の動作が明確に定義されました。
     
-* .execute() の戻り値の定義が変更されました。以前は、戻り値は
-  (正しく実装するのが困難な) SQL 文の型に基づいて決定されてい
-  ました -- 現仕様では見て意義になりました; 代わりに、より柔軟
-  性のある .rowcount 属性を使ってください。モジュールを古い形
-  式の戻り値を返すようにさせるのは自由ですが、もはや必須の仕様
-  ではなく、データベースインタフェース依存のものとみなされてい
-  ます。
+* `.execute()`_ の戻り値の定義が変更されました。
+  以前は、戻り値は SQL 文の型に基づいて決定されていました (そのため、正しく実装するのが困難でした)。現仕様では戻り値は未定義になり、結果の行数の取得にはよりフレキシブルな `.rowcount`_ 属性をいます。
+  モジュールの実装で、古い形式の戻り値を返させるのは自由ですが、もはや必須の仕様ではなく、データベースインタフェース固有の仕様として扱います。
     
-* クラスベースの例外が仕様に組み込まれました。モジュール実装者
-  は、定義されている例外クラスをサブクラス化することで、この仕
-  様で定義されている例外レイアウトを自由に拡張できるようになり
-  ました。
+* クラスベースの例外が仕様に組み込まれました。
+  モジュールの開発者は、この仕様の例外クラスのレイアウトをサブクラスで自由に拡張できます。
 
 以下は DB API 2.0 公開後に追加された仕様です:
 
@@ -959,81 +947,79 @@ Python データベース API 2.0 では、1.0 に対していくつかの大き
   様化されました。
 
 
+.. _Open Issues:
+
 未解決の問題
 ==============
 
-バージョン 2.0 仕様では、1.0 で未解決となっていた多くの疑問を解き
-ましたが、いまだ将来のバージョンで解決されるべき問題をいくつか抱え
-ています:
+バージョン 2.0 仕様は、1.0 で未解決となっていた多くの課題を解決しましたが、今後のバージョンで解決するべき問題がいくつか残っています。
     
-* 次の結果セットを取得可能な際に .nextset() が返すべき有用な値
-  を定義しなければなりません。
+* `.nextset()`_ の戻り値として、次の結果セットを得られる時に返すべき有用な値を決めねばなりません。
 
-* 通貨と 10 進数のロスレス変換フォーマットのために、浮動小数点
-  型を作らなければなりません。
+* 通貨や 10 進小数を相互にロスレス変換できるフォーマットとして、 `decimal モジュール <http://docs.python.org/library/decimal.html>`_ の ``Decimal`` オブジェクトを組み込まねばなりません。
 
 
-注釈
+.. _Footnotes:
+
+付記
 ======
 
-.. [1] ガイドラインとして、connection のコンストラクタに与えるパラメ
-    タは直感的に利用できるようキーワード引数として実装されるべきで
-    す。また、パラメタを以下の順番にすべきです:
-    
-    dsn         データソース名の文字列
-    user        ユーザ名の文字列 (オプション)
-    password    パスワード文字列 (オプション)
-    host        ホスト名 (オプション)
-    database    データベース名 (オプション)
-    
-    例えば、 connect メソッドは以下のようになります:
-    
-    connect(dsn='myhost:MYDB',user='guido',password='234$')
-    
-.. [2] モジュールの実装者は、他の書式よりも 'numeric'、 'named' 、
-    あるいは 'pyformat' を使うべきです。これらの書式にはより明瞭性
-    と柔軟性があります。
+.. [1] ガイドラインとして、connection のコンストラクタに指定するパラメタは、直感的に利用できるよう、キーワード引数として実装せねばなりません。また、パラメタの順番は以下のようにしてください:
 
-.. [3] メソッドが要求する機能をデータベースがサポートしていない場合、
-    インタフェースはそのメソッドが使われたときに例外を発行するよう
-    にすべきです。
+   ============= ===============================
+   パラメタ      意味
+   ============= ===============================
+   ``dsn``       データソース名の文字列
+   ``user``      ユーザ名の文字列 (オプション)
+   ``password``  パスワード文字列 (オプション)
+   ``host``      ホスト名 (オプション)
+   ``database``  データベース名 (オプション)
+   ============= ===============================
     
-    推奨するアプローチは、該当するメソッドについて何も実装しないと
-    いう方法です。そうすれば、Python はメソッドが要求された際に
-    AttributeError を生成します。これにより、プログラマは標準の関
-    数 hasattr() を使ってデータベースの機能を調べることができます。
+   例えば、 connect メソッドは以下のようになります::
     
-    動的にインタフェースの設定が行われるデータベースに大しては、動
-    的にメソッドを利用可能にするように求めるのは適切ではないかもし
-    れません。この場合、インタフェースでは NotSupportedErrors を発
-    行して、メソッドが呼び出された際にロールバックを行う昨日がない
-    ことを示すべきです。
+     connect(dsn='myhost:MYDB',user='guido',password='234$')
+    
+.. [2] 明瞭性やフレキシビリティの高い ``numeric``, ``named``, ``pyformat`` を使うようにしてください。
+
+.. [3] メソッドの実行に必要な機能をデータベースがサポートしていない場合は、メソッドが使われたときに何らかの例外を送出させてください。
+
+   推奨するアプローチは、このメソッドを全く実装しないという方法です。
+   そうすれば、メソッドが呼ばれたときに、 Pythonが ``AttributeError`` を送出します。
+   このアプローチには、開発者が ``hasattr()`` を使ってロールバック機能の有無を調べられるという利点もあります。
+
+   動的にインタフェースを構成するようなモジュールの場合、ロールバック動的に利用可能にする実装が適切でないこともあります。
+   そういうときは、メソッドが呼ばれたときに ``NotSupportedError`` を送出して、ロールバックの機能がないことを示してください。
       
-.. [4] データベースインタフェースでは、メソッドに文字列引数を与えるこ
-    とで、名前つきカーソルをサポートしてもかまいません。この機能は
-    .fetchXXX() メソッドの動作定義を難解にするため、本仕様の一部で
-    はありません。
+.. [4] このメソッドに文字列引数を持たせて、名前つきカーソルをサポートしてもかまいません。
+   ただし、この機能は `.fetch*()`_ メソッドの動作の定義を難解にするため、本仕様の一部ではありません。
 
-.. [5] モジュールは __getitem__ メソッドを parameters オブジェクトに
-    使って、位置 (整数) または名前 (文字列) をパラメタ値に対応付け
-    ます。これにより、配列とマップ型の両方を入力として使えるように
-    なります。
+.. [5] モジュールを実装するときは、 parameters オブジェクトの ``__getitem__`` メソッドを使って、インデクス (整数) またはキー (文字列) とパラメタの値を対応付けることになるでしょう。それによって、配列とマップ型の両方を入力として使えます。
     
-    "割り当てる (bind)" という用語は、入力値をデータベースの実行バッ
-    ファに結びつけるプロセスを表します。現実的な意味では、この言葉
-    は入力値が直接的に操作の値として用いられることを示します。クラ
-    イアント側では、値を使うために "エスケープ" する必要はありませ
-    ん -- 値は実際のデータ—ベース上の値と同じになるはずです。
+   *割り当てる* (bind) とは、入力値をデータベースの実行バッファに結びつけるプロセスを表します。
+   この定義は、事実上、入力値がデータベース操作時の値として直接使われることを意味します。
+   データベースクライアントは、値を必ずしもエスケープして使うとは限らないので、値は実際のデータ—ベースの値と同じにせねばなりません。
     
-.. [6] インタフェースではアレイの使用やその他の最適化を使って行フェッチを実装してもよいことに注意してください。このメソッドの呼び出しを行ったときに、カーソルが一行だけ先に進むという保証はされていません。
+.. [6] インタフェースは、この操作を、アレイを使ったり、何らかの最適化を行って実装するかもしれないので注意してください。このメソッドを呼んだ際、カーソルが一行しかレコードを読まないという保証はありません。
    
-.. [7] rowcount 属性の値は、動的に更新されるようにコーディングしてもかまいません。これは、意味のある rowcount 値を最初に .fetchXXX() メソッドを呼び出した直後にしか返さないようなデータ
-    ベースで有用です。
+.. [7] ``rowcount`` 属性の値は、値を動的に更新するような実装にしてもかまいません。このふるまいは、最初に ``.fetch*()`` メソッドを呼び出すまで、意味のある ``rowcount`` 値をに返さないデータベースの場合に便利です。
+
+.. [8] 実装のヒント: Python の C 拡張では、カーソルオブジェクトは ``.__iter__()`` メソッドの代わり、に ``tp_iter`` スロットを実装することになるでしょう。
+
+.. [9] 「影響を受けた行数 (*number of affected rows*) 」は、通常、データベースカーソルで直前に実行した操作により、削除・更新・挿入された行数を指します。
+    ほとんどのデータベースは、 ``WHERE`` 節で絞り込んだ後の行数を返します。
+    データベースによっては、 ``UPDATE`` のときの行数の解釈が異なり、実際に ``UPDATE`` で変更した行数だけを返すために、 ``WHERE`` 節による行数より少ないことがあります。
+    データベースモジュールの作者は、基本的には ``WHERE`` 節による行数を返すような実装を試みてください。それができないときは、 ``.rowcount`` 属性の意味が通常と異なる旨、明確にドキュメントに記載してください。
 
 謝辞
 =====
 
 Python Database API Specification 2.0 を原版の HTML 形式から PEP 形式に変換した Andrew Kuchling に深く感謝します。
+
+2 フェーズコミット API 拡張の標準化にあたって議論をまとめた James Henstridge に感謝します。
+
+テキスト形式の PEP から ReST に変換し、各所にリンクできるようにした Daniele Varrazzo に感謝します。
+
 
 著作権
 =========

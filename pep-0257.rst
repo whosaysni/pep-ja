@@ -251,8 +251,7 @@ docstring の先頭と末尾の空行は取り除かれます。
 .. [2] PEP 258, Docutils Design Specification, Goodger
    (http://www.python.org/peps/pep-0258.html)
 
-.. [3] Guido van Rossum, Python's creator and Benevolent Dictator For
-   Life.
+.. [3] Guido van Rossum 氏、Python の作者で、「慈悲深き終身独裁者 (Benevolent Dictator For Life)」
 
 .. _Docutils: http://docutils.sourceforge.net/
 
